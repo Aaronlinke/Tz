@@ -1012,35 +1012,75 @@ if __name__ == "__main__":
                 let outputMessage = 'Code erfolgreich ausgeführt';
                 let outputType = 'success';
                 
-                // Simuliere Logik-Ausgabe (verbessert)
-                if (code.includes('Fehler bei Ausführung') && code.includes('System lernt')) {
-                    addOutput('❌ FEHLER erkannt und protokolliert.', 'error');
-                    addOutput('🧠 System-Aktion: Lernprozess gestartet. Code-Logik wird optimiert.', 'success');
-                    outputMessage = 'Fehler behoben und Lernprozess abgeschlossen.';
+                try {
+                    // Save original console methods
+                    const originalConsole = {
+                        log: console.log,
+                        error: console.error,
+                        warn: console.warn,
+                        info: console.info
+                    };
+                    
+                    // Intercept console methods to make everything visible
+                    console.log = function(...args) {
+                        const message = args.map(arg => 
+                            typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+                        ).join(' ');
+                        addOutput(message, 'info');
+                        originalConsole.log.apply(console, args);
+                    };
+                    
+                    console.error = function(...args) {
+                        const message = args.map(arg => 
+                            typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+                        ).join(' ');
+                        addOutput(message, 'error');
+                        originalConsole.error.apply(console, args);
+                    };
+                    
+                    console.warn = function(...args) {
+                        const message = args.map(arg => 
+                            typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+                        ).join(' ');
+                        addOutput(message, 'warning');
+                        originalConsole.warn.apply(console, args);
+                    };
+                    
+                    console.info = function(...args) {
+                        const message = args.map(arg => 
+                            typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+                        ).join(' ');
+                        addOutput(message, 'info');
+                        originalConsole.info.apply(console, args);
+                    };
+                    
+                    // Execute the code with intercepted console
+                    addOutput('📋 ALLE KONSOLEN-AUSGABEN WERDEN SICHTBAR GEMACHT...', 'info');
+                    eval(code);
+                    
+                    // Restore original console methods
+                    console.log = originalConsole.log;
+                    console.error = originalConsole.error;
+                    console.warn = originalConsole.warn;
+                    console.info = originalConsole.info;
+                    
+                    outputMessage = 'Code erfolgreich ausgeführt - Alle Operationen transparent';
                     outputType = 'success';
-                } else if (code.includes('evaluate_and_learn')) {
-                    addOutput('🧠 Lern-Protokoll: Fehler als Input verarbeitet. Perfektions-Chance verbessert.', 'success');
-                    outputMessage = 'Lernprozess erfolgreich abgeschlossen.';
-                } else if (code.includes('neuen strategischen Plan') || code.includes('Implementierung')) {
-                     addOutput('📋 NEUER PLAN: Höchste Priorität in die Abarbeitung überführt.', 'success');
-                     outputMessage = 'Strategische Tasks erfolgreich abgeschlossen.';
-                } else {
-                    // Zufällige Erfolgs- oder Warnmeldung
-                    if (Math.random() > 0.8) {
-                        addOutput('⚠️ WARNUNG: Kleinere Optimierungen notwendig für 100% Perfektion.', 'warning');
-                        outputMessage = 'Ausführung mit Warnung beendet.';
-                        outputType = 'warning';
-                    }
+                } catch (error) {
+                    addOutput(`❌ FEHLER: ${error.message}`, 'error');
+                    addOutput('🧠 System-Aktion: Fehler analysiert und protokolliert.', 'info');
+                    outputMessage = 'Fehler bei der Ausführung - Details im Output';
+                    outputType = 'error';
                 }
                 
                 addOutput(outputMessage, outputType);
-                addOutput(`AUSFÜHRUNG BEENDET (${(Math.random() * 3 + 0.5).toFixed(2)}s)`, 'success');
+                addOutput(`AUSFÜHRUNG BEENDET`, 'success');
                 showNotification(outputMessage);
 
                 // Reset status indicator
                 document.querySelector('.chat-panel .status-indicator').classList.add('status-online');
                 document.querySelector('.chat-panel .status-indicator').classList.remove('status-processing');
-            }, 2000);
+            }, 500);
         }
 
         function saveCode() {
