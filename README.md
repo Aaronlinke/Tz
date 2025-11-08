@@ -994,6 +994,8 @@ if __name__ == "__main__":
         }
 
         // Code Execution
+        // Execute Code: Executes user code with full transparency
+        // "Alles durchschauen" - All console operations are intercepted and made visible in the UI
         function executeCode() {
             const code = document.getElementById('code-input').value;
             if (!code.trim()) {
@@ -1021,7 +1023,7 @@ if __name__ == "__main__":
                 };
                 
                 try {
-                    // Intercept console methods to make everything visible
+                    // Intercept console methods to make everything visible (Alles durchschauen)
                     console.log = function(...args) {
                         const message = args.map(arg => 
                             typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
