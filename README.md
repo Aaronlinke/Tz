@@ -1012,15 +1012,15 @@ if __name__ == "__main__":
                 let outputMessage = 'Code erfolgreich ausgeführt';
                 let outputType = 'success';
                 
+                // Save original console methods
+                const originalConsole = {
+                    log: console.log,
+                    error: console.error,
+                    warn: console.warn,
+                    info: console.info
+                };
+                
                 try {
-                    // Save original console methods
-                    const originalConsole = {
-                        log: console.log,
-                        error: console.error,
-                        warn: console.warn,
-                        info: console.info
-                    };
-                    
                     // Intercept console methods to make everything visible
                     console.log = function(...args) {
                         const message = args.map(arg => 
@@ -1058,12 +1058,6 @@ if __name__ == "__main__":
                     addOutput('📋 ALLE KONSOLEN-AUSGABEN WERDEN SICHTBAR GEMACHT...', 'info');
                     eval(code);
                     
-                    // Restore original console methods
-                    console.log = originalConsole.log;
-                    console.error = originalConsole.error;
-                    console.warn = originalConsole.warn;
-                    console.info = originalConsole.info;
-                    
                     outputMessage = 'Code erfolgreich ausgeführt - Alle Operationen transparent';
                     outputType = 'success';
                 } catch (error) {
@@ -1071,6 +1065,12 @@ if __name__ == "__main__":
                     addOutput('🧠 System-Aktion: Fehler analysiert und protokolliert.', 'info');
                     outputMessage = 'Fehler bei der Ausführung - Details im Output';
                     outputType = 'error';
+                } finally {
+                    // Always restore original console methods
+                    console.log = originalConsole.log;
+                    console.error = originalConsole.error;
+                    console.warn = originalConsole.warn;
+                    console.info = originalConsole.info;
                 }
                 
                 addOutput(outputMessage, outputType);
